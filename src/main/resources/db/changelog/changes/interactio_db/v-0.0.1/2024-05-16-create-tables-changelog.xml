@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- region channels -->
+    <changeSet id="create-channel-table" author="Vladyslav Mosiuk">
+        <preConditions onFail="CONTINUE" onFailMessage="Table channel already exists">
+            <not>
+                <tableExists tableName="channels"/>
+            </not>
+        </preConditions>
+        <createTable tableName="channels">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="channel_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chat_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region admins -->
+    <changeSet id="create-admin-table" author="VislavMsq">
+        <preConditions onFail="CONTINUE" onFailMessage="Table admins already exists">
+            <not>
+                <tableExists tableName="admins"/>
+            </not>
+        </preConditions>
+        <createTable tableName="admins">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="channel_id" type="uuid">
+                <constraints foreignKeyName="fk_admins_channel_id"
+                             referencedTableName="channels"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="telegram_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!-- endregion -->
+    <!-- region users -->
+    <changeSet id="create-user-table" author="Vladyslav Mosiuk">
+        <preConditions onFail="CONTINUE" onFailMessage="Table user already exists">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+        <createTable tableName="users">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="telegram_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_message_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="leave_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="join_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="channel_id" type="uuid">
+                <constraints foreignKeyName="fk_user_chat_id"
+                             referencedTableName="channels"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region posts -->
+    <changeSet id="create-post-table" author="Vladyslav Mosiuk">
+        <preConditions onFail="CONTINUE" onFailMessage="Table post already exists">
+            <not>
+                <tableExists tableName="posts"/>
+            </not>
+        </preConditions>
+        <createTable tableName="posts">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="telegram_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="channel_id" type="uuid">
+                <constraints foreignKeyName="fk_post_public_id"
+                             referencedTableName="channels"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region messages -->
+    <changeSet id="create-message-table" author="Vladyslav Mosiuk">
+        <preConditions onFail="CONTINUE" onFailMessage="Table message already exists">
+            <not>
+                <tableExists tableName="messages"/>
+            </not>
+        </preConditions>
+        <createTable tableName="messages">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="message_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interaction_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="channel_id" type="uuid">
+                <constraints foreignKeyName="fk_message_chat_id"
+                             referencedTableName="channels"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints foreignKeyName="fk_message_user_id"
+                             referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="post_id" type="uuid">
+                <constraints foreignKeyName="fk_message_post_id"
+                             referencedTableName="posts"
+                             referencedColumnNames="id" nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region polls -->
+    <changeSet id="create-polls-table" author="Vladyslav Mosiuk">
+        <createTable tableName="polls">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="channel_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_polls_channel_id"
+                             referencedTableName="channels"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!-- endregion -->
+    <!-- region buttons -->
+    <changeSet id="create-buttons-table" author="Vladyslav Mosiuk">
+        <createTable tableName="buttons">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="poll_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="callback_data" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region button user links -->
+    <changeSet id="create-button-user-links-table" author="Vladyslav Mosiuk">
+        <createTable tableName="button_user_links">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_button_user_links_user"
+                             referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="button_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_button_user_links_button"
+                             referencedTableName="buttons"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region notifications -->
+    <changeSet id="create-notification-table" author="VislavMsq">
+        <preConditions onFail="CONTINUE">
+            <not>
+                <tableExists tableName="notifications"/>
+            </not>
+        </preConditions>
+        <createTable tableName="notifications">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="channel_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_notification_channel_id"
+                             referencedTableName="channels"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region  button table-->
+    <changeSet id="create-notification_button-table" author="VislavMsq">
+        <preConditions onFail="CONTINUE">
+            <not>
+                <tableExists tableName="nonification_button"/>
+            </not>
+        </preConditions>
+        <createTable tableName="nonification_button">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="notification_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_notification_button_notification_id"
+                             referencedTableName="notifications"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="name_button" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url_button" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="callback_data" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region image -->
+    <changeSet id="create-image-table" author="Vladyslav Mosiuk">
+        <preConditions onFail="CONTINUE" onFailMessage="Table image already exists">
+            <not>
+                <tableExists tableName="images"/>
+            </not>
+        </preConditions>
+        <createTable tableName="images">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="image_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_image_notification_id"
+                             referencedTableName="notifications"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region otp -->
+    <changeSet id="create-otp-table" author="Vladyslav Mosiuk">
+        <createTable tableName="otp">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="otp" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!-- region web_users -->
+    <changeSet id="create-web_users" author="Vladyslav Mosiuk">
+        <createTable tableName="web_users">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="telegram_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region raw_polls -->
+    <changeSet id="create-raw_polls" author="Vladyslav Mosiuk">
+        <createTable tableName="raw_polls">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="web_user_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_web_user_raw_poll_id"
+                             referencedTableName="web_users"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region button_raw -->
+    <changeSet id="button_raw" author="Vladyslav Mosiuk">
+        <createTable tableName="button_raw">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="poll_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_button_raw_poll_id"
+                             referencedTableName="raw_polls"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region web_stats -->
+    <changeSet id="web_stats" author="Vladyslav Mosiuk">
+        <createTable tableName="web_stats">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="channel_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="local_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="global_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="view_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reaction_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reply_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_view_update" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_reaction_update" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_reply_update" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+    <!-- region web_stats_historys -->
+    <changeSet id="create-web_stats_historys" author="VislavMsq">
+        <createTable tableName="web_stats_historys">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="last_view_update" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_reaction_update" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_reply_update" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="view_count" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reaction_count" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reply_count" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="web_stats_id" type="uuid">
+                <constraints nullable="false"
+                             foreignKeyName="fk_web_stats_history_web_stats_id"
+                             referencedTableName="web_stats"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <!--endregion-->
+</databaseChangeLog>

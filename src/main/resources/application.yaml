@@ -1,0 +1,24 @@
+spring:
+  main:
+    banner-mode: off
+
+  datasource:
+    password: 208634
+    url: jdbc:postgresql://localhost:5432/interactio_db
+    username: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    defer-datasource-initialization: false
+    open-in-view: false
+    show-sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml
+    drop-first: false
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+  port: 8090
