@@ -89,7 +89,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>org.telegrambotapp.Main</mainClass>
+                            <mainClass>org.stb.TelegramBotApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
