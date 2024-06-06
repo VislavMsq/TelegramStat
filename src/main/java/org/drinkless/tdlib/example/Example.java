@@ -195,6 +195,7 @@ public final class Example {
 
         return future;
     }
+
     ////
     public static CompletableFuture<TdApi.ChatStatistics> getChatStatistics(long chatId, boolean isDark) {
         CompletableFuture<TdApi.ChatStatistics> future = new CompletableFuture<>();
@@ -447,7 +448,11 @@ public final class Example {
         currentPrompt = prompt;
         Scanner scanner = new Scanner(System.in);
         String str = "";
-        str = scanner.nextLine();
+        try {
+            str = scanner.nextLine();
+        } finally {
+            scanner.close();
+        }
         currentPrompt = null;
         return str;
     }
