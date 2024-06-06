@@ -445,13 +445,9 @@ public final class Example {
     private static String promptString(String prompt) {
         System.out.print(prompt);
         currentPrompt = prompt;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Scanner scanner = new Scanner(System.in);
         String str = "";
-        try {
-            str = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        str = scanner.nextLine();
         currentPrompt = null;
         return str;
     }
