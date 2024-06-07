@@ -132,8 +132,6 @@ public class BotMethods {
 //        if (update.hasMessage() && update.getMessage().hasText()) {
 //            proceedAdminMessage(update, bot);
 //        }
-
-
     }
 
     // має перетворити рав в нормальнне ентіті та додати деякі фішки типу зробити колбек дата
@@ -141,7 +139,7 @@ public class BotMethods {
         long chatId = update.getMessage().getChat().getId();
         String welcomeMessage = "Hi bro, ya Petro";
 
-        SendMessage request = new SendMessage(String.valueOf(chatId), welcomeMessage);
+        SendMessage request = Util.toMessage(chatId, welcomeMessage);
         bot.execute(request);
     }
 
