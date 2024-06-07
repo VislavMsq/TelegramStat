@@ -34,6 +34,8 @@ public final class Example {
     private static volatile boolean needQuit = false;
     private static volatile boolean canQuit = false;
 
+    private static final Scanner scanner = new Scanner(System.in);
+
     private static final Client.ResultHandler defaultHandler = new DefaultHandler();
 
     private static final Lock authorizationLock = new ReentrantLock();
@@ -446,12 +448,11 @@ public final class Example {
     private static String promptString(String prompt) {
         System.out.print(prompt);
         currentPrompt = prompt;
-        Scanner scanner = new Scanner(System.in);
         String str = "";
         try {
             str = scanner.nextLine();
-        } finally {
-            scanner.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         currentPrompt = null;
         return str;
