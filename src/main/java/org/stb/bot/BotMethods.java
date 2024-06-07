@@ -113,6 +113,10 @@ public class BotMethods {
             connectionService.handleConnectMessage(update, bot);
             return;
         }
+        if (update.getMessage().getText().startsWith("/start")) {
+            handleStartMessage(update, bot);
+            return;
+        }
 
 //        if (update.getMessage().getText().startsWith("/test")) {
 //            bot.execute(toMessage(update.getMessage().getChatId(), update.getMessage().getMessageId().toString()));
@@ -133,7 +137,13 @@ public class BotMethods {
     }
 
     // має перетворити рав в нормальнне ентіті та додати деякі фішки типу зробити колбек дата
+    private void handleStartMessage(Update update, TGBot bot) throws TelegramApiException {
+        long chatId = update.getMessage().getChat().getId();
+        String welcomeMessage = "Hi bro, ya Petro";
 
+        SendMessage request = new SendMessage(String.valueOf(chatId), welcomeMessage);
+        bot.execute(request);
+    }
 
     private void proceedUserMessage(Update update, TGBot bot) throws TelegramApiException {
         Long code = new Random().nextLong();
