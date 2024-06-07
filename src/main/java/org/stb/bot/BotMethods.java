@@ -82,6 +82,7 @@ public class BotMethods {
                 webStats.setLastUpdateView(LocalDateTime.now());
 
                 webStatsRepository.save(webStats);
+                System.out.println(webStats);
 
                 Post post = new Post();
                 post.setTelegramId(update.getMessage().getMessageId());

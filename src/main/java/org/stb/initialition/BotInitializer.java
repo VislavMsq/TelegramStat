@@ -71,6 +71,10 @@ public class BotInitializer {
 
                         WebStats webStats = webStatsRepository.findFirstByChannelIdAndLocalId(channel.getChannelId(), localId);
 
+                        if (webStats == null) {
+                            continue;
+                        }
+
                         TdApi.Message message = Example.getMessageById(channel.getChannelId(), webStats.getGlobalId()).join();
 
                         int views = message.interactionInfo.viewCount;
@@ -114,7 +118,7 @@ public class BotInitializer {
                             webStats.setLastUpdateView(LocalDateTime.now());
                             webStatsHistory.setViewCount(views);
                             webStatsHistory.setLastUpdateView(LocalDateTime.now());
-                        }else {
+                        } else {
                             webStatsHistory.setLastUpdateView(webStats.getLastUpdateView());
                             webStatsHistory.setViewCount(webStats.getViewCount());
                         }
@@ -125,8 +129,8 @@ public class BotInitializer {
 
                         transactionTemplate.execute((TransactionCallback<Void>) status -> {
                             if (webStats.getLastUpdateReaction().equals(webStatsHistory.getLastUpdateReaction()) &&
-                                webStats.getLastUpdateReply().equals(webStatsHistory.getLastUpdateReply()) &&
-                                webStats.getLastUpdateView().equals(webStatsHistory.getLastUpdateView())) {
+                                    webStats.getLastUpdateReply().equals(webStatsHistory.getLastUpdateReply()) &&
+                                    webStats.getLastUpdateView().equals(webStatsHistory.getLastUpdateView())) {
                                 return null;
                             }
                             WebStats updatedWebStats = webStatsRepository.saveAndFlush(webStats); // Сохраняем обновленную сущность WebStats
@@ -147,6 +151,7 @@ public class BotInitializer {
         thread.setDaemon(true);
         thread.start();
     }
+
     // написати запускач потоку що буде запускатись окремим потоком та робити ці речі
     /*
     transactionTemplate.execute((TransactionCallback<Void>) status -> {
