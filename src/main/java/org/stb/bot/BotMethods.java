@@ -50,6 +50,7 @@ public class BotMethods {
         }
         if (update.hasMessage()) {
             Message message = update.getMessage();
+            System.out.println(message.getFrom().getFirstName());
             if (message.getFrom().getFirstName().equals("Telegram")) {
                 GetChat getChat = new GetChat();
                 getChat.setChatId(update.getMessage().getChatId());
