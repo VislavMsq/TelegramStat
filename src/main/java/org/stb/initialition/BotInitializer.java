@@ -41,8 +41,14 @@ public class BotInitializer {
     private final WebStatsHistoryRepository webStatsHistoryRepository;
 
     @EventListener({ContextRefreshedEvent.class})
-    public void init() throws TelegramApiException {
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+    public void init() {
+        TelegramBotsApi telegramBotsApi = null;
+        try {
+            telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+        } catch (TelegramApiException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
         try {
             telegramBotsApi.registerBot(telegramBot);
             userListener(telegramBot);

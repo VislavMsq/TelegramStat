@@ -66,6 +66,7 @@ public class BotMethods {
 
 
                 List<TdApi.Message> messageList = Example.getChatHistory(chat.getId(), 10).join();
+                System.out.println("=================================================");
 
                 TdApi.Message msg = Example.getMessageWithText(chat.getId(), 10, message.getText()).join();
 
