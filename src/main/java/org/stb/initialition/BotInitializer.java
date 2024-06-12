@@ -84,7 +84,11 @@ public class BotInitializer {
                         TdApi.Message message = Example.getMessageById(channel.getChannelId(), webStats.getGlobalId()).join();
 
                         int views = message.interactionInfo.viewCount;
-                        int replyCount = message.interactionInfo.replyInfo.replyCount;
+                        int replyCount = 0;
+                        if (message.interactionInfo.replyInfo != null) {
+                            replyCount = message.interactionInfo.replyInfo.replyCount;
+                        }
+
                         TdApi.MessageReactions reaction = message.interactionInfo.reactions;
                         WebStatsHistory webStatsHistory = new WebStatsHistory();
                         Integer reactionCount = 0;

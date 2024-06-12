@@ -123,17 +123,20 @@ public final class Example {
                             return;
                         }
                     }
-                    LOGGER.info("Message not found");
+                    LOGGER.error("Message not found");
+                    LOGGER.error("Received response from TDLib: " + object);
+                    LOGGER.info("Content: " + msgs);
+                    LOGGER.info("Text: " + text);
                     future.complete(null);
                 } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
-                    LOGGER.info("Received an error: " + object);
+                    LOGGER.error("Received an error: " + object);
                     future.complete(null);
                 } else {
-                    LOGGER.info("Received wrong response from TDLib: " + object);
+                    LOGGER.error("Received wrong response from TDLib: " + object);
                     future.complete(null);
                 }
             } catch (Exception e) {
-                LOGGER.info("Exception occurred: " + e);
+                LOGGER.error("Exception occurred: " + e);
                 future.complete(null);
             }
         });
