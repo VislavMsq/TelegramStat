@@ -3,15 +3,15 @@ package org.stb.bot;
 import lombok.RequiredArgsConstructor;
 import org.drinkless.tdlib.TdApi;
 import org.drinkless.tdlib.example.Example;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.stb.entity.*;
 import org.stb.repository.*;
 import org.stb.service.*;
+import org.stb.util.Debug;
 import org.stb.util.Util;
-import org.stb.entity.*;
-import org.stb.repository.*;
-import org.stb.service.*;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 @RequiredArgsConstructor
 public class BotMethods {
-    //    private static final Logger LOGGER = LoggerFactory.getLogger(BotMethods.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BotMethods.class);
     private final ChannelService channelService;
     private final PostService postService;
     private final UserService userService;
@@ -52,24 +52,222 @@ public class BotMethods {
             Message message = update.getMessage();
             System.out.println(message.getFrom().getFirstName());
             if (message.getFrom().getFirstName().equals("Telegram")) {
+                System.out.println("---------------------------------------");
+//                System.out.println(message);
+
+                String text = null;
+                String fileUniqueId = null;
+
+                if (message.hasText()) {
+                    text = message.getText();
+                } else if (message.getCaption() != null) {
+                    text = message.getCaption();
+//                    fileUniqueId = message.getVideoNote().getFileUniqueId();
+//                    System.out.println(fileUniqueId);
+                }
+                /*
+                * Message(messageId=1244,
+                * messageThreadId=null,
+                * from=User(id=777000,
+                *   firstName=Telegram,
+                *   isBot=false,
+                *   lastName=null,
+                *   userName=null,
+                *   languageCode=null,
+                *   canJoinGroups=null,
+                *   canReadAllGroupMessages=null,
+                *   supportInlineQueries=null,
+                *   isPremium=null,
+                *   addedToAttachmentMenu=null),
+                * date=1718194666,
+                * chat=Chat(id=-1002114948564,
+                *   type=supergroup,
+                *   title=TestPublick Chat,
+                *   firstName=null,
+                *   lastName=null,
+                *   userName=null,
+                *   photo=null,
+                *   description=null,
+                *   inviteLink=null,
+                *   pinnedMessage=null,
+                *   stickerSetName=null,
+                *   canSetStickerSet=null,
+                *   permissions=null,
+                *   slowModeDelay=null,
+                *   bio=null,
+                *   linkedChatId=null,
+                *   location=null,
+                *   messageAutoDeleteTime=null,
+                *   hasPrivateForwards=null,
+                *   HasProtectedContent=null,
+                *   joinToSendMessages=null,
+                *   joinByRequest=null,
+                *   hasRestrictedVoiceAndVideoMessages=null,
+                *   isForum=null,
+                *   activeUsernames=null,
+                *   emojiStatusCustomEmojiId=null,
+                *   hasAggressiveAntiSpamEnabled=null,
+                *   hasHiddenMembers=null),
+                * forwardFrom=null,
+                * forwardFromChat=Chat(id=-1002051569930,
+                *   type=channel,
+                *  title=TestPublick,
+                *  firstName=null,
+                *  lastName=null,
+                *  userName=testpublickkkkkkk,
+                *  photo=null,
+                *  description=null,
+                *  inviteLink=null,
+                *  pinnedMessage=null,
+                *  stickerSetName=null,
+                *  canSetStickerSet=null,
+                *  permissions=null,
+                *  slowModeDelay=null,
+                *  bio=null,
+                *  linkedChatId=null,
+                *  location=null,
+                * messageAutoDeleteTime=null,
+                * sPrivateForwards=null
+                * HasProtectedContent=null
+                * joinToSendMessages=null
+                * joinByRequest=null
+                * hasRestrictedVoiceAndVideoMessages=null
+                * isForum=null
+                * activeUsernames=null
+                * emojiStatusCustomEmojiId=null
+                * hasAggressiveAntiSpamEnabled=null
+                * hasHiddenMembers=null)
+                * forwardDate=1718194663
+                * text=null
+                * entities=null
+                * captionEntities=null
+                * audio=null
+                * document=null
+                * photo=null
+                * sticker=null
+                * video=null
+                * contact=null
+                * location=null
+                * venue=null
+                * animation=null
+                * pinnedMessage=null
+                * newChatMembers=[]
+                * leftChatMember=null
+                * newChatTitle=null
+                * newChatPhoto=null
+                * deleteChatPhoto=null
+                * groupchatCreated=null,
+                * replyToMessage=null
+                * voice=null
+                * caption=null
+                * superGroupCreated=null
+                * channelChatCreated=null
+                * migrateToChatId=null
+                * migrateFromChatId=null
+                * editDate=null
+                * game=null
+                * forwardFromMessageId=232
+                * invoice=null
+                * successfulPayment=null
+                * videoNote=VideoNote(fileId=DQACAgIAAx0Cfg-N1AACBNxmaZHqq44ClvrntBDhxfH3R6wJzQAC10gAArAISUsoeb5TcP-F6jUE
+                * fileUniqueId=AgAD10gAArAISUs
+                * length=400
+                * duration=4
+                * thumbnail=PhotoSize(fileId=AAMCAgADHQJ-D43UAAIE3GZpkeqrjgKW-ue0EOHF8fdHrAnNAALXSAACsAhJSyh5vlNw_4XqAQAHbQADNQQ
+                * fileUniqueId=AQAD10gAArAISUty
+                * width=320
+                * height=320
+                * fileSize=5931
+                * filePath=null)
+                * fileSize=328703)
+                * authorSignature=null
+                * forwardSignature=null
+                * mediaGroupId=null
+                * connectedWebsite=null
+                * passportData=null
+                * forwardSenderName=null
+                * poll=null
+                * replyMarkup=null
+                * dice=null
+                * viaBot=null
+                * senderChat=Chat(id=-1002051569930
+                * type=channel
+                * title=TestPublick
+                * firstName=null
+                * lastName=null
+                * userName=testpublickkkkkkk
+                * photo=null
+                * description=null
+                * inviteLink=null
+                * pinnedMessage=null
+                * stickerSetName=null
+                * canSetStickerSet=null
+                * permissions=null
+                * slowModeDelay=null
+                * bio=null
+                * linkedChatId=null
+                * location=null
+                * messageAutoDeleteTime=null
+                * hasPrivateForwards=null
+                * HasProtectedContent=null
+                * joinToSendMessages=null
+                * joinByRequest=null
+                * hasRestrictedVoiceAndVideoMessages=null
+                * isForum=null
+                * activeUsernames=null
+                * emojiStatusCustomEmojiId=null
+                * hasAggressiveAntiSpamEnabled=null
+                * hasHiddenMembers=null)
+                * proximityAlertTriggered=null
+                * messageAutoDeleteTimerChanged=null
+                * isAutomaticForward=true
+                * hasProtectedContent=null
+                * webAppData=null
+                * videoChatStarted=null
+                * videoChatEnded=null
+                * videoChatParticipantsInvited=null
+                * videoChatScheduled=null
+                * isTopicMessage=null
+                * forumTopicCreated=null
+                * forumTopicClosed=null
+                * forumTopicReopened=null
+                * forumTopicEdited=null
+                * generalForumTopicHidden=null
+                * generalForumTopicUnhidden=null
+                * writeAccessAllowed=null
+                * hasMediaSpoiler=null
+                * userShared=null
+                * chatShared=null)
+                *
+                *
+                * */
+                System.out.println(message.getText());
+                System.out.println(message.getCaption());
+                System.out.println("1111111111111111111111111111111");
+
                 GetChat getChat = new GetChat();
                 getChat.setChatId(update.getMessage().getChatId());
                 Chat chat = bot.execute(getChat);
-                System.out.println(chat.getId());
+//                System.out.println(chat.getId());
 
                 WebStats webStats = new WebStats();
 
                 getChat.setChatId(chat.getLinkedChatId());
                 chat = bot.execute(getChat);
 
-                System.out.println("====channelId=====");
-                System.out.println(chat.getId());
-
+//                System.out.println("====channelId=====");
+//                System.out.println(chat.getId());
 
                 List<TdApi.Message> messageList = Example.getChatHistory(chat.getId(), 10).join();
-                System.out.println("=================================================");
+//                System.out.println("=================================================");
 
-                TdApi.Message msg = Example.getMessageWithText(chat.getId(), 10, message.getText()).join();
+                TdApi.Message msg = Example.getMessageWithText(chat.getId(), 10, text).join();
+                if (msg == null) {
+                    LOGGER.info("message dont contain text");
+                    return;
+                }
+
+//                System.out.println("=================================================");
 
                 webStats.setChannelId(chat.getId());
                 webStats.setGlobalId(msg.id);
@@ -79,9 +277,11 @@ public class BotMethods {
                 webStats.setReactionCount(0);
                 webStats.setReplyCount(0);
 
-                webStats.setLastUpdateReaction(LocalDateTime.now());
-                webStats.setLastUpdateReply(LocalDateTime.now());
-                webStats.setLastUpdateView(LocalDateTime.now());
+                LocalDateTime now = LocalDateTime.now();
+
+                webStats.setLastUpdateReaction(now);
+                webStats.setLastUpdateReply(now);
+                webStats.setLastUpdateView(now);
 
                 webStatsRepository.save(webStats);
                 System.out.println(webStats);

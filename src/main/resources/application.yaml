@@ -15,7 +15,7 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/changelog-master.xml
-    drop-first: false
+    drop-first: true
 
 server:
   error:

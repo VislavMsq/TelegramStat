@@ -8,11 +8,13 @@ package org.drinkless.tdlib.example;
 
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.stb.bot.BotMethods;
+import org.stb.util.Debug;
 
-import java.io.BufferedReader;
 import java.io.IOError;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +29,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * Example class for TDLib usage from Java.
  */
 public final class Example {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BotMethods.class);
+
     private static Client client = null;
 
     private static TdApi.AuthorizationState authorizationState = null;
@@ -68,30 +72,144 @@ public final class Example {
         }
     }
 
+    /**
+     * Retrieves the first message with the specified text in a chat.
+     *
+     * @param chatId The ID of the chat.
+     * @param limit The maximum number of messages to retrieve.
+     * @param text The text to search for in the messages.
+     * @return A CompletableFuture that completes with the first message with the specified text, or completes exceptionally if no such message is found.
+     */
     public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, int limit, String text) {
         CompletableFuture<TdApi.Message> future = new CompletableFuture<>();
         TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
 
+        if (text == null) {
+            future.complete(null);
+            return future;
+        }
+
         client.send(getChatHistory, object -> {
-            if (object.getConstructor() == TdApi.Messages.CONSTRUCTOR) {
-                TdApi.Messages msgs = (TdApi.Messages) object;
-                for (TdApi.Message msg : msgs.messages) {
-                    TdApi.MessageText content = (TdApi.MessageText) msg.content;
-                    if (content.text.text.contains(text)) {
-                        getMessageByIdAndText(chatId, msg.id, text).thenAccept(future::complete);
-                        return;
+            try {
+                if (object.getConstructor() == TdApi.Messages.CONSTRUCTOR) {
+                    TdApi.Messages msgs = (TdApi.Messages) object;
+                    for (TdApi.Message msg : msgs.messages) {
+                        String content = null;
+                        switch (msg.content.getConstructor()) {
+                            case TdApi.MessageText.CONSTRUCTOR:
+                                content = ((TdApi.MessageText) msg.content).text.text;
+                                break;
+                            case TdApi.MessageAnimation.CONSTRUCTOR:
+                                content = ((TdApi.MessageAnimation) msg.content).caption.text;
+                                break;
+                            case TdApi.MessageAudio.CONSTRUCTOR:
+                                content = ((TdApi.MessageAudio) msg.content).caption.text;
+                                break;
+                            case TdApi.MessageDocument.CONSTRUCTOR:
+                                content = ((TdApi.MessageDocument) msg.content).caption.text;
+                                break;
+                            case TdApi.MessagePhoto.CONSTRUCTOR:
+                                content = ((TdApi.MessagePhoto) msg.content).caption.text;
+                                break;
+                            case TdApi.MessageVideo.CONSTRUCTOR:
+                                content = ((TdApi.MessageVideo) msg.content).caption.text;
+                                break;
+                        }
+                        if (content == null) {
+                            continue;
+                        }
+                        if (content.contains(text)) {
+                            future.complete(msg);
+                            return;
+                        }
                     }
+                    LOGGER.info("Message not found");
+                    future.complete(null);
+                } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
+                    LOGGER.info("Received an error: " + object);
+                    future.complete(null);
+                } else {
+                    LOGGER.info("Received wrong response from TDLib: " + object);
+                    future.complete(null);
                 }
-                future.completeExceptionally(new Exception("Message not found"));
-            } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
-                future.completeExceptionally(new Exception("Receive an error: " + object));
-            } else {
-                future.completeExceptionally(new Exception("Receive wrong response from TDLib: " + object));
+            } catch (Exception e) {
+                LOGGER.info("Exception occurred: " + e);
+                future.complete(null);
             }
         });
 
         return future;
     }
+
+    /*
+    0000000000000000000000000000000
+      TdApi.MessagePhoto photoContent = (TdApi.MessagePhoto) msg.content;
+                        if (photoContent.caption.text.contains(text)) {
+                            LOGGER.info("88");
+                            future.complete(msg);
+    000000000000000000000000000000000000000000000000000000000000000
+
+    public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, int limit, String text) {
+    CompletableFuture<TdApi.Message> future = new CompletableFuture<>();
+    TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
+
+    client.send(getChatHistory, object -> {
+        if (object.getConstructor() == TdApi.Messages.CONSTRUCTOR) {
+            TdApi.Messages msgs = (TdApi.Messages) object;
+            for (TdApi.Message msg : msgs.messages) {
+                if (msg.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                    TdApi.MessageText content = (TdApi.MessageText) msg.content;
+                    if (content.text.text.contains(text)) {
+                        System.out.println(msg);
+                        future.complete(msg);
+                        return;
+                    }
+                }
+            }
+            future.completeExceptionally(new Exception("Message not found"));
+        } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
+            future.completeExceptionally(new Exception("Receive an error: " + object));
+        } else {
+            future.completeExceptionally(new Exception("Receive wrong response from TDLib: " + object));
+        }
+    });
+
+    return future;
+}
+==================================================================================
+public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, int limit, String text) {
+    CompletableFuture<TdApi.Message> future = new CompletableFuture<>();
+    TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
+
+    client.send(getChatHistory, object -> {
+        if (object.getConstructor() == TdApi.Messages.CONSTRUCTOR) {
+            TdApi.Messages msgs = (TdApi.Messages) object;
+            for (TdApi.Message msg : msgs.messages) {
+                if (msg.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                    TdApi.MessageText content = (TdApi.MessageText) msg.content;
+                    if (content.text.text.contains(text)) {
+                        System.out.println(msg);
+                        getMessageByIdAndText(chatId, msg.id, text).thenAccept(future::complete)
+                            .exceptionally(ex -> {
+                                future.completeExceptionally(ex);
+                                return null;
+                            });
+                        return;
+                    }
+                }
+            }
+            future.completeExceptionally(new Exception("Message not found"));
+        } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
+            future.completeExceptionally(new Exception("Receive an error: " + object));
+        } else {
+            future.completeExceptionally(new Exception("Receive wrong response from TDLib: " + object));
+        }
+    });
+
+    return future;
+}
+
+     */
 
 //    public static void getMessageWithText(long chatId, int limit, String text) {
 //        TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
@@ -104,14 +222,27 @@ public final class Example {
 //                    getMessageByIdAndText(chatId, msg.id, text);
 //                }
 //            }
-//
-//
 //        });
 //    }
 
     public static CompletableFuture<TdApi.Message> getMessageByIdAndText(long chatId, long messageId, String text) {
         CompletableFuture<TdApi.Message> future = new CompletableFuture<>();
         TdApi.GetMessage getMessageRequest = new TdApi.GetMessage(chatId, messageId);
+//        TdApi.GetChat getChat = new TdApi.GetChat(chatId);
+
+
+//        client.send(getChat, object -> {
+//            switch (object.getConstructor()) {
+//                case TdApi.GetChat.CONSTRUCTOR:
+//                    TdApi.Chat chat = (TdApi.Chat) object;
+//                    LOGGER.info(chat.toString());
+//                case TdApi.Error.CONSTRUCTOR:
+//                    LOGGER.info("Received an error: {}", object);
+//                default:
+//                    LOGGER.info("Received wrong response from TDLib: {}", object);
+//            }
+//        });
+
 
         client.send(getMessageRequest, object -> {
             switch (object.getConstructor()) {
@@ -143,9 +274,12 @@ public final class Example {
         TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
 
         client.send(getChatHistory, object -> {
+//            LOGGER.info("chat history");
             if (object.getConstructor() == TdApi.Messages.CONSTRUCTOR) {
                 TdApi.Messages msgs = (TdApi.Messages) object;
                 List<TdApi.Message> messages = Arrays.asList(msgs.messages);
+//                LOGGER.info(messages.toString());
+//                LOGGER.info(String.valueOf(messages.size()));
                 future.complete(messages);
             } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
                 future.completeExceptionally(new Exception("Receive an error: " + object));

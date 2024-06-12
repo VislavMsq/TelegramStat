@@ -50,7 +50,6 @@ public class BotInitializer {
             return;
         }
         try {
-            telegramBotsApi.registerBot(telegramBot);
             userListener(telegramBot);
             try {
                 Example.main(new String[]{});
@@ -58,6 +57,7 @@ public class BotInitializer {
                 LOGGER.error("TDLib error: ", e);
             }
             tdLibUpdater();
+            telegramBotsApi.registerBot(telegramBot);
             LOGGER.info("готовий до роботи");
         } catch (TelegramApiException e) {
             LOGGER.error(e.getMessage());
