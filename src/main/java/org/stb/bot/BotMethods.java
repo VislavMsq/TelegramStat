@@ -64,6 +64,7 @@ public class BotMethods {
                     text = message.getCaption();
 //                    fileUniqueId = message.getVideoNote().getFileUniqueId();
 //                    System.out.println(fileUniqueId);
+                }
                 System.out.println(message.getText());
                 System.out.println(message.getCaption());
                 System.out.println("1111111111111111111111111111111");
