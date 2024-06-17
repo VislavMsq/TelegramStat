@@ -50,9 +50,9 @@ public class BotMethods {
         }
         if (update.hasMessage()) {
             Message message = update.getMessage();
-            System.out.println(message.getFrom().getFirstName());
+//            System.out.println(message.getFrom().getFirstName());
             if (message.getFrom().getFirstName().equals("Telegram")) {
-                System.out.println("---------------------------------------");
+//                System.out.println("---------------------------------------");
 //                System.out.println(message);
 
                 String text = null;
@@ -65,9 +65,9 @@ public class BotMethods {
 //                    fileUniqueId = message.getVideoNote().getFileUniqueId();
 //                    System.out.println(fileUniqueId);
                 }
-                System.out.println(message.getText());
-                System.out.println(message.getCaption());
-                System.out.println("1111111111111111111111111111111");
+//                System.out.println(message.getText());
+//                System.out.println(message.getCaption());
+//                System.out.println("1111111111111111111111111111111");
 
                 GetChat getChat = new GetChat();
                 getChat.setChatId(update.getMessage().getChatId());
@@ -108,7 +108,8 @@ public class BotMethods {
                 webStats.setLastUpdateView(now);
 
                 webStatsRepository.save(webStats);
-                System.out.println(webStats);
+                LOGGER.info("webStats created: {}", webStats);
+//                System.out.println(webStats);
 
                 Post post = new Post();
                 post.setTelegramId(update.getMessage().getMessageId());

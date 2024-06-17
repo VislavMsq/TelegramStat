@@ -17,6 +17,8 @@ import java.util.HashSet;
 @Service
 @RequiredArgsConstructor
 public class ChannelServiceImpl implements ChannelService {
+    private final ChannelRepository channelRepository;
+
     @Override
     public Channel getChannel(Update update, TGBot bot) throws TelegramApiException {
         Message message = update.getMessage();
@@ -47,7 +49,7 @@ public class ChannelServiceImpl implements ChannelService {
             channel.setTitle(chat.getTitle());
             channel.setChatId(chat.getLinkedChatId());
 
-            System.out.println(channel);
+//            System.out.println(channel);
 
             channelRepository.save(channel);
         } else {
@@ -55,6 +57,4 @@ public class ChannelServiceImpl implements ChannelService {
         }
         return channel;
     }
-
-    private final ChannelRepository channelRepository;
 }

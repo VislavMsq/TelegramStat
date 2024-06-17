@@ -71,7 +71,7 @@ public class BotInitializer {
                 List<Channel> channels = channelRepository.findAll();
                 for (Channel channel : channels) {
                     Set<Post> posts = channel.getPost();
-                    System.out.println(posts);
+//                    System.out.println(posts);
                     for (Post post : posts) {
                         int localId = post.getTelegramId();
 
@@ -134,8 +134,8 @@ public class BotInitializer {
                         }
                         webStatsHistory.setWebStats(webStats);
 
-                        System.out.println(webStats);
-                        System.out.println(webStatsHistory);
+//                        System.out.println(webStats);
+//                        System.out.println(webStatsHistory);
 
                         transactionTemplate.execute((TransactionCallback<Void>) status -> {
                             if (webStats.getLastUpdateReaction().equals(webStatsHistory.getLastUpdateReaction()) &&

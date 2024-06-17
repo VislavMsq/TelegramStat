@@ -97,22 +97,50 @@ public final class Example {
                         String content = null;
                         switch (msg.content.getConstructor()) {
                             case TdApi.MessageText.CONSTRUCTOR:
-                                content = ((TdApi.MessageText) msg.content).text.text;
+                                System.out.println("just text");
+                                TdApi.MessageText contentText = (TdApi.MessageText) msg.content;
+                                System.out.println(contentText);
+                                content = contentText.text.text;
                                 break;
                             case TdApi.MessageAnimation.CONSTRUCTOR:
-                                content = ((TdApi.MessageAnimation) msg.content).caption.text;
+                                System.out.println("animation");
+//                                content = ((TdApi.MessageAnimation) msg.content).caption.text;
+                                TdApi.MessageAnimation contentAnimation = (TdApi.MessageAnimation) msg.content;
+                                System.out.println(contentAnimation);
+                                content = contentAnimation.caption.text;
                                 break;
                             case TdApi.MessageAudio.CONSTRUCTOR:
-                                content = ((TdApi.MessageAudio) msg.content).caption.text;
+                                System.out.println("audio");
+//                                content = ((TdApi.MessageAudio) msg.content).caption.text;
+                                TdApi.MessageAudio contentAudio = (TdApi.MessageAudio) msg.content;
+                                System.out.println(contentAudio);
+                                content = contentAudio.caption.text;
                                 break;
                             case TdApi.MessageDocument.CONSTRUCTOR:
-                                content = ((TdApi.MessageDocument) msg.content).caption.text;
+                                System.out.println("document");
+//                                content = ((TdApi.MessageDocument) msg.content).caption.text;
+                                TdApi.MessageDocument contentDocument = (TdApi.MessageDocument) msg.content;
+                                System.out.println(contentDocument);
+                                content = contentDocument.caption.text;
                                 break;
                             case TdApi.MessagePhoto.CONSTRUCTOR:
-                                content = ((TdApi.MessagePhoto) msg.content).caption.text;
+                                System.out.println("photo");
+//                                content = ((TdApi.MessagePhoto) msg.content).caption.text;
+                                TdApi.MessagePhoto contentPhoto = (TdApi.MessagePhoto) msg.content;
+                                System.out.println(contentPhoto);
+                                content = contentPhoto.caption.text;
                                 break;
                             case TdApi.MessageVideo.CONSTRUCTOR:
-                                content = ((TdApi.MessageVideo) msg.content).caption.text;
+                                System.out.println("video");
+//                                content = ((TdApi.MessageVideo) msg.content).caption.text;
+                                TdApi.MessageVideo contentVideo = (TdApi.MessageVideo) msg.content;
+                                System.out.println(contentVideo);
+                                content = contentVideo.caption.text;
+                                break;
+                            default:
+                                System.out.println("default");
+                                System.out.println(msg.content.getConstructor());
+                                System.out.println(msg.content);
                                 break;
                         }
                         if (content == null) {
@@ -124,9 +152,9 @@ public final class Example {
                         }
                     }
                     LOGGER.error("Message not found");
-                    LOGGER.error("Received response from TDLib: " + object);
-                    LOGGER.info("Content: " + msgs);
-                    LOGGER.info("Text: " + text);
+//                    LOGGER.error("Received response from TDLib: " + object);
+//                    LOGGER.info("Content: " + msgs);
+//                    LOGGER.info("Text: " + text);
                     future.complete(null);
                 } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
                     LOGGER.error("Received an error: " + object);
