@@ -76,8 +76,8 @@ public final class Example {
      * Retrieves the first message with the specified text in a chat.
      *
      * @param chatId The ID of the chat.
-     * @param limit The maximum number of messages to retrieve.
-     * @param text The text to search for in the messages.
+     * @param limit  The maximum number of messages to retrieve.
+     * @param text   The text to search for in the messages.
      * @return A CompletableFuture that completes with the first message with the specified text, or completes exceptionally if no such message is found.
      */
     public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, int limit, String text) {
@@ -144,8 +144,10 @@ public final class Example {
                                 break;
                         }
                         if (content == null) {
+                            LOGGER.warn("контент (текст) пустий");
                             continue;
                         }
+                        LOGGER.info("\ntext1:{}\ntext2:{}\ncontains:{}\nequals{}", content, text, content.contains(text), content.equals(text));
                         if (content.contains(text)) {
                             future.complete(msg);
                             return;
