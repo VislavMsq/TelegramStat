@@ -42,26 +42,15 @@ public class BotInitializer {
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() {
-        TelegramBotsApi telegramBotsApi = null;
+        userListener(telegramBot);
         try {
-            telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-        } catch (TelegramApiException e) {
-            LOGGER.error(e.getMessage());
-            return;
+            Example.main(new String[]{});
+        } catch (Exception e) {
+            LOGGER.error("TDLib error: ", e);
         }
-        try {
-            userListener(telegramBot);
-            try {
-                Example.main(new String[]{});
-            } catch (Exception e) {
-                LOGGER.error("TDLib error: ", e);
-            }
-            tdLibUpdater();
-            telegramBotsApi.registerBot(telegramBot);
-            LOGGER.info("готовий до роботи");
-        } catch (TelegramApiException e) {
-            LOGGER.error(e.getMessage());
-        }
+        tdLibUpdater();
+        telegramBot.init();
+        LOGGER.info("готовий до роботи");
     }
 
 

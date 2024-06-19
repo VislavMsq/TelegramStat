@@ -9,6 +9,8 @@ import org.springframework.context.annotation.PropertySource;
 @Data
 @PropertySource("application.properties")
 public class BotConfig {
+    @Value("${webhook.path}")
+    String webhookPath;
     @Value("${bot.name}")
     String botName;
     @Value("${bot.token}")

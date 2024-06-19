@@ -147,7 +147,7 @@ public final class Example {
                             LOGGER.warn("контент (текст) пустий");
                             continue;
                         }
-                        LOGGER.info("\ntext1:{}\ntext2:{}\ncontains:{}\nequals{}", content, text, content.contains(text), content.equals(text));
+                        LOGGER.info("\ntext1:{}\ntext2:{}\ncontains:{}\nequals:{}", content, text, content.contains(text), content.equals(text));
                         if (content.contains(text)) {
                             future.complete(msg);
                             return;

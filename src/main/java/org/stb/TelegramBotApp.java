@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({ "org.stb"})
+@ComponentScan({"org.stb"})
 public class TelegramBotApp {
     public static void main(String[] args) {
         SpringApplication.run(TelegramBotApp.class, args);
