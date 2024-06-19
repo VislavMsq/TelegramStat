@@ -42,7 +42,6 @@ public class BotInitializer {
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() {
-        userListener(telegramBot);
         try {
             Example.main(new String[]{});
         } catch (Exception e) {
@@ -50,6 +49,7 @@ public class BotInitializer {
         }
         tdLibUpdater();
         telegramBot.init();
+        userListener(telegramBot);
         LOGGER.info("готовий до роботи");
     }
 
