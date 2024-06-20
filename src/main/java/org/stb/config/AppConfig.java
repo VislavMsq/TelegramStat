@@ -1,5 +1,6 @@
 package org.stb.config;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,7 @@ import org.stb.initialition.BotConfig;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Configuration
 public class AppConfig {
     private final BotConfig botConfig;
