@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 @RestController
 public class TelegramBotController {
-    MyWebhookBot bot;
+    private final MyWebhookBot bot;
 
     @PostMapping("/telegram-wh/eva")
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
