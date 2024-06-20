@@ -1,6 +1,6 @@
 package org.stb.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,10 +8,10 @@ import org.stb.bot.MyWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RestController
 public class TelegramBotController {
-    private final MyWebhookBot bot;
+    MyWebhookBot bot;
 
     @PostMapping("/telegram-wh/eva")
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {

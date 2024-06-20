@@ -14,8 +14,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @RequiredArgsConstructor
 @Configuration
 public class AppConfig {
-    BotConfig botConfig;
-    BotMethods botMethods;
+    private final BotConfig botConfig;
+    private final BotMethods botMethods;
 
     @Bean
     public MyWebhookBot myWebhookBot() {
