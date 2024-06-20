@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.concurrent.ExecutionException;
 
-@Component
+//@Component
 @AllArgsConstructor
 public class MyWebhookBot extends TelegramWebhookBot {
 
