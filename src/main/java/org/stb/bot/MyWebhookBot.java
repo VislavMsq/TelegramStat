@@ -1,6 +1,6 @@
 package org.stb.bot;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.concurrent.ExecutionException;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MyWebhookBot extends TelegramWebhookBot {
 
     private final BotMethods botMethods;
