@@ -48,17 +48,17 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class WebhookController {
 
     private final BotMethods botMethods;
-    private final TGBot tgBot;
+    private final TGBot myWebhookBot;
 
-    public WebhookController(BotMethods botMethods, TGBot tgBot) {
+    public WebhookController(BotMethods botMethods, TGBot myWebhookBot) {
         this.botMethods = botMethods;
-        this.tgBot = tgBot;
+        this.myWebhookBot = myWebhookBot;
     }
 
     @PostMapping("/webhook")
     public void onUpdateReceived(@RequestBody Update update) {
         try {
-            botMethods.handleUpdate(update, tgBot);
+            botMethods.handleUpdate(update, myWebhookBot);
         } catch (Exception e) {
             LoggerFactory.getLogger(WebhookController.class).error("Error handling update", e);
         }

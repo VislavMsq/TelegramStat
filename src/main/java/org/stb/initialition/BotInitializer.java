@@ -11,7 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.stb.bot.TGBot;
+import org.stb.bot.MyWebhookBot;
 import org.stb.entity.*;
 import org.stb.repository.ChannelRepository;
 import org.stb.repository.WebStatsHistoryRepository;
@@ -32,7 +32,7 @@ public class BotInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BotInitializer.class);
     private final TransactionTemplate transactionTemplate;
 
-    private final TGBot telegramBot;
+    private final MyWebhookBot telegramBot;
     private final ChannelRepository channelRepository;
     private final WebStatsRepository webStatsRepository;
     private final WebStatsHistoryRepository webStatsHistoryRepository;
@@ -45,7 +45,6 @@ public class BotInitializer {
             LOGGER.error("TDLib error: ", e);
         }
         tdLibUpdater();
-        telegramBot.init();
         userListener(telegramBot);
         LOGGER.info("готовий до роботи");
     }
@@ -166,7 +165,7 @@ public class BotInitializer {
     }
      */
     // в окремумо ваайлту циклы та буде даемоном
-    private void userListener(TGBot bot) {
+    private void userListener(MyWebhookBot bot) {
         Thread thread = new Thread(() -> {
             while (true) {
                 // Get the list of users

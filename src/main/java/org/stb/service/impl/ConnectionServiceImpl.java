@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.stb.bot.TGBot;
+import org.stb.bot.MyWebhookBot;
 import org.stb.entity.Channel;
 import org.stb.repository.ChannelRepository;
 import org.stb.service.ConnectionService;
@@ -31,7 +31,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public void handleConnectMessage(Update update, TGBot bot) throws TelegramApiException {
+    public void handleConnectMessage(Update update, MyWebhookBot bot) throws TelegramApiException {
         Message message = update.getMessage();
         if (message.getChat().isUserChat()) {
             handleGetConnectForUser(update, bot);
@@ -44,7 +44,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public void handleGetConnectForUser(Update update, TGBot bot) throws TelegramApiException {
+    public void handleGetConnectForUser(Update update, MyWebhookBot bot) throws TelegramApiException {
         Message message = update.getMessage();
         long chatId = message.getChatId();
         UUID id = UUID.randomUUID();
@@ -53,14 +53,14 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public void handleSetConnectMessage(Update update, TGBot bot) throws TelegramApiException {
+    public void handleSetConnectMessage(Update update, MyWebhookBot bot) throws TelegramApiException {
         LOGGER.info("З`єднання адміна з каналом");
         handleSetConnectForAdmin(update, bot);
     }
 
     @Override
     @Transactional
-    public void handleSetConnectForAdmin(Update update, TGBot bot) throws TelegramApiException {
+    public void handleSetConnectForAdmin(Update update, MyWebhookBot bot) throws TelegramApiException {
         Message message = update.getMessage();
         Long chatId = message.getChatId();
         String[] ss = message.getText().split(" ");

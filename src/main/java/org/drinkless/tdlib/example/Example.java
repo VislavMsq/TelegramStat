@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stb.bot.BotMethods;
 import org.stb.entity.enums.Status;
-import org.stb.util.Debug;
 import org.stb.util.SpecialOption;
 
 import java.io.IOError;
@@ -245,6 +244,11 @@ public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, i
 }
 
      */
+
+    public static void test(Long chatId) {
+        TdApi.GetSupergroupFullInfo getSupergroupFullInfo = new TdApi.GetSupergroupFullInfo(chatId);
+
+    }
 
 //    public static void getMessageWithText(long chatId, int limit, String text) {
 //        TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);

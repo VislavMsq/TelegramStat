@@ -11,7 +11,6 @@ import org.stb.entity.*;
 import org.stb.entity.enums.Status;
 import org.stb.repository.*;
 import org.stb.service.*;
-import org.stb.util.Debug;
 import org.stb.util.SpecialOption;
 import org.stb.util.Util;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
@@ -45,7 +44,7 @@ public class BotMethods {
     private final PostRepository postRepository;
 
     @Transactional
-    public void handleUpdate(Update update, TGBot bot) throws TelegramApiException, ExecutionException, InterruptedException {
+    public void handleUpdate(Update update, MyWebhookBot bot) throws TelegramApiException, ExecutionException, InterruptedException {
         if (update.hasCallbackQuery()) {
             callBackService.proceedCallBack(update.getCallbackQuery(), bot);
             return;
@@ -191,7 +190,7 @@ public class BotMethods {
     }
 
     // має перетворити рав в нормальнне ентіті та додати деякі фішки типу зробити колбек дата
-    private void handleStartMessage(Update update, TGBot bot) throws TelegramApiException {
+    private void handleStartMessage(Update update, MyWebhookBot bot) throws TelegramApiException {
         long chatId = update.getMessage().getChat().getId();
         String welcomeMessage = "Hi bro, ya Petro";
 
@@ -199,7 +198,7 @@ public class BotMethods {
         bot.execute(request);
     }
 
-    private void proceedUserMessage(Update update, TGBot bot) throws TelegramApiException {
+    private void proceedUserMessage(Update update, MyWebhookBot bot) throws TelegramApiException {
         Long code = new Random().nextLong();
         OTP otp = new OTP();
         otp.setOtp(code);
@@ -216,7 +215,7 @@ public class BotMethods {
     Збирати повідомлення користувачів, якщо це повідомлення належить до посту, зв'язувати його з постом.
     Якщо це просто написано, тоді в повідомленні, де написано повідомлення - null
      */
-    private void checkMessage(Update update, TGBot bot) throws TelegramApiException {
+    private void checkMessage(Update update, MyWebhookBot bot) throws TelegramApiException {
         Message message = update.getMessage();
         Message reply = message.getReplyToMessage();
         Channel channel = channelService.getChannel(update, bot);
@@ -252,17 +251,17 @@ public class BotMethods {
     відсилати йому повідомлення типу "прийди до нас у нас є багато цікових новин"
     написати це повідомлення потрібно після 3-10 діб після відписки.
      */
-    public static void checkUser(User user, TGBot tgBot) throws TelegramApiException {
+    public static void checkUser(User user, MyWebhookBot myWebhookBot) throws TelegramApiException {
         if (user.getLeaveTime() != null) {
             if (user.getLeaveTime().isBefore(user.getLeaveTime().minusDays(4))) {
                 SendMessage sendMessage = Util.toMessage(user.getTelegramId(), "прийди до нас у нас є багато цікових новин\n" +
                         "https://t.me/+DHDt6LLgj7Y1N2Qy");
-                tgBot.execute(sendMessage);
+                myWebhookBot.execute(sendMessage);
             }
         } else if (user.getLastMessageTime().isBefore(user.getLastMessageTime().minusDays(2))) {
             SendMessage sendMessage = Util.toMessage(user.getTelegramId(), "незабувайте про наш чат\n"
                     + "https://t.me/+DHDt6LLgj7Y1N2Qy");
-            tgBot.execute(sendMessage);
+            myWebhookBot.execute(sendMessage);
         }
     }
 }

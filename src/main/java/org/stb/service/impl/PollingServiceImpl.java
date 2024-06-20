@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.drinkless.tdlib.example.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.stb.bot.TGBot;
+import org.stb.bot.MyWebhookBot;
 import org.stb.service.PollingService;
 import org.stb.util.Util;
 import org.stb.entity.Button;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.stb.util.Util.toMessage;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class PollingServiceImpl implements PollingService {
 
     @Override
     @Transactional
-    public void pollingConstructor(Poll poll, TGBot bot) throws TelegramApiException {
+    public void pollingConstructor(Poll poll, MyWebhookBot bot) throws TelegramApiException {
         List<Button> buttons = poll.getButtons();
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
@@ -55,7 +54,7 @@ public class PollingServiceImpl implements PollingService {
 
     @Override
     @Transactional
-    public void proceedPolling(Update update, TGBot bot) throws TelegramApiException {
+    public void proceedPolling(Update update, MyWebhookBot bot) throws TelegramApiException {
         String text = update.getMessage().getText();
         String[] result = text.split(" ");
         UUID id = UUID.fromString(result[1]);

@@ -1,6 +1,6 @@
 package org.stb.service;
 
-import org.stb.bot.TGBot;
+import org.stb.bot.MyWebhookBot;
 import org.stb.entity.Channel;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CallBackService {
-    void proceedCallBack(CallbackQuery callbackQuery, TGBot bot) throws TelegramApiException;
+    void proceedCallBack(CallbackQuery callbackQuery, MyWebhookBot bot) throws TelegramApiException;
 
     SendMessage createCallBack(Update update) throws TelegramApiException;
 

@@ -2,7 +2,7 @@ package org.stb.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.stb.bot.TGBot;
+import org.stb.bot.MyWebhookBot;
 import org.stb.entity.Channel;
 import org.stb.repository.ChannelRepository;
 import org.stb.service.ChannelService;
@@ -20,7 +20,7 @@ public class ChannelServiceImpl implements ChannelService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public Channel getChannel(Update update, TGBot bot) throws TelegramApiException {
+    public Channel getChannel(Update update, MyWebhookBot bot) throws TelegramApiException {
         Message message = update.getMessage();
         Channel channel = new Channel();
         if (!channelRepository.existsByChatId(message.getChatId())) {
