@@ -13,27 +13,27 @@ import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @AllArgsConstructor
-@Configuration
+//@Configuration
 public class AppConfig {
     private final BotConfig botConfig;
     private final BotMethods botMethods;
 
-    @Bean
-    public MyWebhookBot myWebhookBot() {
-        String path = "https://mriyabothub.chost.com.ua/";
-
-        MyWebhookBot bot = new MyWebhookBot(botMethods, botConfig.getBotName(), botConfig.getToken(), botConfig.getWebhookPath());
-
-        SetWebhook setWebhook = SetWebhook.builder()
-                .url(path + botConfig.getWebhookPath())
-                .build();
-
-        try {
-            bot.setWebhook(setWebhook);
-        } catch (TelegramApiException e) {
-            LoggerFactory.getLogger(ExceptionDetector.class).error("Error while setting webhook: {}", e.getMessage());
-        }
-
-        return bot;
-    }
+//    @Bean
+//    public MyWebhookBot myWebhookBot() {
+//        String path = "https://mriyabothub.chost.com.ua/";
+//
+//        MyWebhookBot bot = new MyWebhookBot(botMethods, botConfig.getBotName(), botConfig.getToken(), botConfig.getWebhookPath());
+//
+//        SetWebhook setWebhook = SetWebhook.builder()
+//                .url(path + botConfig.getWebhookPath())
+//                .build();
+//
+//        try {
+//            bot.setWebhook(setWebhook);
+//        } catch (TelegramApiException e) {
+//            LoggerFactory.getLogger(ExceptionDetector.class).error("Error while setting webhook: {}", e.getMessage());
+//        }
+//
+//        return bot;
+//    }
 }
