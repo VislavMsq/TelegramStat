@@ -11,7 +11,9 @@ import org.drinkless.tdlib.TdApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stb.bot.BotMethods;
+import org.stb.entity.enums.Status;
 import org.stb.util.Debug;
+import org.stb.util.SpecialOption;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -80,12 +82,12 @@ public final class Example {
      * @param text   The text to search for in the messages.
      * @return A CompletableFuture that completes with the first message with the specified text, or completes exceptionally if no such message is found.
      */
-    public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, int limit, String text) {
-        CompletableFuture<TdApi.Message> future = new CompletableFuture<>();
+    public static CompletableFuture<SpecialOption> getMessageWithText(long chatId, int limit, String text) {
+        CompletableFuture<SpecialOption> future = new CompletableFuture<>();
         TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
 
         if (text == null) {
-            future.complete(null);
+            future.complete(new SpecialOption(null, Status.NULL));
             return future;
         }
 
@@ -99,48 +101,48 @@ public final class Example {
                             case TdApi.MessageText.CONSTRUCTOR:
                                 System.out.println("just text");
                                 TdApi.MessageText contentText = (TdApi.MessageText) msg.content;
-                                System.out.println(contentText);
+//                                System.out.println(contentText);
                                 content = contentText.text.text;
                                 break;
                             case TdApi.MessageAnimation.CONSTRUCTOR:
                                 System.out.println("animation");
 //                                content = ((TdApi.MessageAnimation) msg.content).caption.text;
                                 TdApi.MessageAnimation contentAnimation = (TdApi.MessageAnimation) msg.content;
-                                System.out.println(contentAnimation);
+//                                System.out.println(contentAnimation);
                                 content = contentAnimation.caption.text;
                                 break;
                             case TdApi.MessageAudio.CONSTRUCTOR:
                                 System.out.println("audio");
 //                                content = ((TdApi.MessageAudio) msg.content).caption.text;
                                 TdApi.MessageAudio contentAudio = (TdApi.MessageAudio) msg.content;
-                                System.out.println(contentAudio);
+//                                System.out.println(contentAudio);
                                 content = contentAudio.caption.text;
                                 break;
                             case TdApi.MessageDocument.CONSTRUCTOR:
                                 System.out.println("document");
 //                                content = ((TdApi.MessageDocument) msg.content).caption.text;
                                 TdApi.MessageDocument contentDocument = (TdApi.MessageDocument) msg.content;
-                                System.out.println(contentDocument);
+//                                System.out.println(contentDocument);
                                 content = contentDocument.caption.text;
                                 break;
                             case TdApi.MessagePhoto.CONSTRUCTOR:
                                 System.out.println("photo");
 //                                content = ((TdApi.MessagePhoto) msg.content).caption.text;
                                 TdApi.MessagePhoto contentPhoto = (TdApi.MessagePhoto) msg.content;
-                                System.out.println(contentPhoto);
+//                                System.out.println(contentPhoto);
                                 content = contentPhoto.caption.text;
                                 break;
                             case TdApi.MessageVideo.CONSTRUCTOR:
                                 System.out.println("video");
 //                                content = ((TdApi.MessageVideo) msg.content).caption.text;
                                 TdApi.MessageVideo contentVideo = (TdApi.MessageVideo) msg.content;
-                                System.out.println(contentVideo);
+//                                System.out.println(contentVideo);
                                 content = contentVideo.caption.text;
                                 break;
                             default:
                                 System.out.println("default");
                                 System.out.println(msg.content.getConstructor());
-                                System.out.println(msg.content);
+//                                System.out.println(msg.content);
                                 break;
                         }
                         if (content == null) {
@@ -149,7 +151,7 @@ public final class Example {
                         }
                         LOGGER.info("\ntext1:{}\ntext2:{}\ncontains:{}\nequals:{}", content, text, content.contains(text), content.equals(text));
                         if (content.contains(text)) {
-                            future.complete(msg);
+                            future.complete(new SpecialOption(msg, Status.OK));
                             return;
                         }
                     }
@@ -157,17 +159,17 @@ public final class Example {
 //                    LOGGER.error("Received response from TDLib: " + object);
 //                    LOGGER.info("Content: " + msgs);
 //                    LOGGER.info("Text: " + text);
-                    future.complete(null);
+                    future.complete(new SpecialOption(null, Status.EMPTY));
                 } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
                     LOGGER.error("Received an error: " + object);
-                    future.complete(null);
+                    future.complete(new SpecialOption(null, Status.EXCEPTION));
                 } else {
                     LOGGER.error("Received wrong response from TDLib: " + object);
-                    future.complete(null);
+                    future.complete(new SpecialOption(null, Status.EXCEPTION));
                 }
             } catch (Exception e) {
                 LOGGER.error("Exception occurred: " + e);
-                future.complete(null);
+                future.complete(new SpecialOption(null, Status.EXCEPTION));
             }
         });
 

@@ -8,9 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.stb.entity.*;
+import org.stb.entity.enums.Status;
 import org.stb.repository.*;
 import org.stb.service.*;
 import org.stb.util.Debug;
+import org.stb.util.SpecialOption;
 import org.stb.util.Util;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -85,14 +87,39 @@ public class BotMethods {
                 List<TdApi.Message> messageList = Example.getChatHistory(chat.getId(), 10).join();
 //                System.out.println("=================================================");
 
-                TdApi.Message msg = Example.getMessageWithText(chat.getId(), 10, text).join();
-                if (msg == null) {
-                    LOGGER.info("message dont contain text");
-                    return;
+                TdApi.Message msg = null;
+                SpecialOption specialOption = null;
+                int delayMinutes = 5;
+
+                for (int i = 0; i < 5; i++) {
+                    specialOption = Example.getMessageWithText(chat.getId(), 10, text).join();
+                    if (specialOption.getStatus() == Status.OK) {
+                        msg = specialOption.getMessage();
+                        break;
+                    } else if (specialOption.getStatus() == Status.EMPTY) {
+                        LOGGER.warn("message not found: {}", text);
+                        LOGGER.info("retry in {} minutes", delayMinutes);
+                    } else if (specialOption.getStatus() == Status.NULL) {
+                        LOGGER.error("message has not content");
+                        return;
+                    } else {
+                        LOGGER.info("error while getting message");
+                        return;
+                    }
+                    Thread.sleep(delayMinutes * 60000);
+                    delayMinutes *= 2; // double the delay for the next iteration
                 }
 
-
-//                System.out.println("=================================================");
+                if (specialOption.getStatus() == Status.EMPTY || msg == null) {
+                    LOGGER.warn("message not found: {}", text);
+                    return;
+                } else if (specialOption.getStatus() == Status.NULL) {
+                    LOGGER.error("message has not content");
+                    return;
+                } else if (specialOption.getStatus() != Status.OK) {
+                    LOGGER.info("error while getting message");
+                    return;
+                }
 
                 webStats.setChannelId(chat.getId());
                 webStats.setGlobalId(msg.id);
