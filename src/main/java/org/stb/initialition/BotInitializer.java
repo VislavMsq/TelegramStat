@@ -15,11 +15,8 @@ import org.stb.bot.TGBot;
 import org.stb.entity.*;
 import org.stb.repository.ChannelRepository;
 import org.stb.repository.WebStatsHistoryRepository;
-import org.stb.entity.*;
 import org.stb.repository.WebStatsRepository;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.time.LocalDateTime;
 import java.util.*;
