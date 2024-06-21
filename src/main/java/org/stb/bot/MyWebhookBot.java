@@ -61,18 +61,17 @@ public class MyWebhookBot extends TelegramWebhookBot {
 
     public void deleteWebhook() {
         ResponseEntity<String> response = restTemplate.postForEntity(String.format("%s%s/deleteWebhook", telegram_api, botConfig.getToken()), null, String.class);
-        LoggerFactory.getLogger(WebhookHandler.class).info(response.toString());
+        LoggerFactory.getLogger(WebhookHandler.class).info(response.getBody());
 
     }
 
     public void setWebhook() {
         ResponseEntity<String> response = restTemplate.postForEntity(String.format("%s%s/setWebhook?url=%s%s", telegram_api, botConfig.getToken(), botConfig.getRootPath(), botConfig.getWebhookPath()), null, String.class);
-        LoggerFactory.getLogger(WebhookHandler.class).info(response.toString());
+        LoggerFactory.getLogger(WebhookHandler.class).info(response.getBody());
     }
 
     public void webhookInfo() {
         ResponseEntity<String> response = restTemplate.getForEntity(String.format("%s%s/getWebhookInfo", telegram_api, botConfig.getToken()), String.class);
-        LoggerFactory.getLogger(WebhookHandler.class).info(response.toString());
+        LoggerFactory.getLogger(WebhookHandler.class).info(response.getBody());
     }
-
 }
