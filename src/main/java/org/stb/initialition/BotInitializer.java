@@ -39,6 +39,8 @@ public class BotInitializer {
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() {
+        telegramBot.webhookInfo();
+        telegramBot.deleteWebhook();
         try {
             Example.main(new String[]{});
         } catch (Exception e) {
@@ -46,6 +48,8 @@ public class BotInitializer {
         }
         tdLibUpdater();
         userListener(telegramBot);
+        telegramBot.setWebhook();
+        telegramBot.webhookInfo();
         LOGGER.info("готовий до роботи");
     }
 
@@ -76,7 +80,7 @@ public class BotInitializer {
 
                         TdApi.MessageReactions reaction = message.interactionInfo.reactions;
                         WebStatsHistory webStatsHistory = new WebStatsHistory();
-                        Integer reactionCount = 0;
+                        Integer reactionCount;
 
                         if (reaction == null) {
                             webStats.setReactionCount(0);
