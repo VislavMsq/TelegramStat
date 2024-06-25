@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -81,12 +82,12 @@ public final class Example {
      * @param text   The text to search for in the messages.
      * @return A CompletableFuture that completes with the first message with the specified text, or completes exceptionally if no such message is found.
      */
-    public static CompletableFuture<SpecialOption> getMessageWithText(long chatId, int limit, String text) {
-        CompletableFuture<SpecialOption> future = new CompletableFuture<>();
+    public static CompletableFuture<SpecialOption<TdApi.Message>> getMessageWithText(long chatId, int limit, String text) {
+        CompletableFuture<SpecialOption<TdApi.Message>> future = new CompletableFuture<>();
         TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
 
         if (text == null) {
-            future.complete(new SpecialOption(null, Status.NULL));
+            future.complete(new SpecialOption<>(null, Status.NULL));
             return future;
         }
 
@@ -150,7 +151,7 @@ public final class Example {
                         }
                         LOGGER.info("\ntext1:{}\ntext2:{}\ncontains:{}\nequals:{}", content, text, content.contains(text), content.equals(text));
                         if (content.contains(text)) {
-                            future.complete(new SpecialOption(msg, Status.OK));
+                            future.complete(new SpecialOption<>(msg, Status.OK));
                             return;
                         }
                     }
@@ -158,23 +159,83 @@ public final class Example {
 //                    LOGGER.error("Received response from TDLib: " + object);
 //                    LOGGER.info("Content: " + msgs);
 //                    LOGGER.info("Text: " + text);
-                    future.complete(new SpecialOption(null, Status.EMPTY));
+                    future.complete(new SpecialOption<>(null, Status.EMPTY));
                 } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
                     LOGGER.error("Received an error: " + object);
-                    future.complete(new SpecialOption(null, Status.EXCEPTION));
+                    future.complete(new SpecialOption<>(null, Status.EXCEPTION));
                 } else {
                     LOGGER.error("Received wrong response from TDLib: " + object);
-                    future.complete(new SpecialOption(null, Status.EXCEPTION));
+                    future.complete(new SpecialOption<>(null, Status.EXCEPTION));
                 }
             } catch (Exception e) {
                 LOGGER.error("Exception occurred: " + e);
-                future.complete(new SpecialOption(null, Status.EXCEPTION));
+                future.complete(new SpecialOption<>(null, Status.EXCEPTION));
             }
         });
 
         return future;
     }
 
+    public static boolean joinChatByInviteLink(String inviteLink) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        TdApi.JoinChatByInviteLink joinChatByInviteLink = new TdApi.JoinChatByInviteLink(inviteLink);
+
+        client.send(joinChatByInviteLink, object -> {
+            if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
+                future.complete(true);
+            } else {
+                future.complete(false);
+            }
+        });
+
+        return future.join();
+    }
+
+    // --------------------------------------------------------------------------------------------
+    public static CompletableFuture<TdApi.Messages> getChatMember(long chatId, int limit) {
+        CompletableFuture<TdApi.Messages> future = new CompletableFuture<>();
+        TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
+
+        client.send(getChatHistory, object -> {
+            if (object.getConstructor() == TdApi.Messages.CONSTRUCTOR) {
+                TdApi.Messages msgs = (TdApi.Messages) object;
+                future.complete(msgs);
+            } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
+                future.completeExceptionally(new Exception("Receive an error: " + object));
+            } else {
+                future.completeExceptionally(new Exception("Receive wrong response from TDLib: " + object));
+            }
+        });
+
+        return future;
+    }
+
+    public static CompletableFuture<SpecialOption<TdApi.Message>> findMessageWithText(TdApi.Messages messages, String text) {
+        CompletableFuture<SpecialOption<TdApi.Message>> future = new CompletableFuture<>();
+
+        for (TdApi.Message msg : messages.messages) {
+            String content = null;
+            switch (msg.content.getConstructor()) {
+                case TdApi.MessageText.CONSTRUCTOR:
+                    TdApi.MessageText contentText = (TdApi.MessageText) msg.content;
+                    content = contentText.text.text;
+                    break;
+                // Add other cases if needed
+            }
+            if (content != null && content.contains(text)) {
+                future.complete(new SpecialOption<>(msg, Status.OK));
+                return future;
+            }
+        }
+
+        future.complete(new SpecialOption<>(null, Status.EMPTY));
+        return future;
+    }
+
+//    public boolean joinByLink() {
+//
+//    }
+// -----------------------------------------------------------------
     /*
     0000000000000000000000000000000
       TdApi.MessagePhoto photoContent = (TdApi.MessagePhoto) msg.content;
@@ -308,8 +369,8 @@ public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, i
         return future;
     }
 
-    public static CompletableFuture<List<TdApi.Message>> getChatHistory(long chatId, int limit) {
-        CompletableFuture<List<TdApi.Message>> future = new CompletableFuture<>();
+    public static CompletableFuture<SpecialOption<List<TdApi.Message>>> getChatHistory(long chatId, int limit) {
+        CompletableFuture<SpecialOption<List<TdApi.Message>>> future = new CompletableFuture<>();
         TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, 0, 0, limit, false);
 
         client.send(getChatHistory, object -> {
@@ -319,11 +380,11 @@ public static CompletableFuture<TdApi.Message> getMessageWithText(long chatId, i
                 List<TdApi.Message> messages = Arrays.asList(msgs.messages);
 //                LOGGER.info(messages.toString());
 //                LOGGER.info(String.valueOf(messages.size()));
-                future.complete(messages);
+                future.complete(new SpecialOption<>(messages, Status.OK));
             } else if (object.getConstructor() == TdApi.Error.CONSTRUCTOR) {
-                future.completeExceptionally(new Exception("Receive an error: " + object));
+                future.complete(new SpecialOption<>(null, Status.EXCEPTION));
             } else {
-                future.completeExceptionally(new Exception("Receive wrong response from TDLib: " + object));
+                future.complete(new SpecialOption<>(null, Status.EXCEPTION));
             }
         });
 

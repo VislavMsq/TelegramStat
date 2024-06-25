@@ -13,15 +13,21 @@ import org.stb.repository.*;
 import org.stb.service.*;
 import org.stb.util.SpecialOption;
 import org.stb.util.Util;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.ExportChatInviteLink;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.ChatInviteLink;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -51,10 +57,7 @@ public class BotMethods {
         }
         if (update.hasMessage()) {
             Message message = update.getMessage();
-//            System.out.println(message.getFrom().getFirstName());
             if (message.getFrom().getFirstName().equals("Telegram")) {
-//                System.out.println("---------------------------------------");
-//                System.out.println(message);
 
                 String text = null;
                 String fileUniqueId = null;
@@ -64,36 +67,55 @@ public class BotMethods {
                 } else if (message.getCaption() != null) {
                     text = message.getCaption();
 //                    fileUniqueId = message.getVideoNote().getFileUniqueId();
-//                    System.out.println(fileUniqueId);
                 }
-//                System.out.println(message.getText());
-//                System.out.println(message.getCaption());
-//                System.out.println("1111111111111111111111111111111");
 
                 GetChat getChat = new GetChat();
                 getChat.setChatId(update.getMessage().getChatId());
                 Chat chat = bot.execute(getChat);
-//                System.out.println(chat.getId());
 
                 WebStats webStats = new WebStats();
 
                 getChat.setChatId(chat.getLinkedChatId());
                 chat = bot.execute(getChat);
 
-//                System.out.println("====channelId=====");
-//                System.out.println(chat.getId());
+                SpecialOption<List<TdApi.Message>> optionMessageList = Example.getChatHistory(chat.getId(), 10).join();
+                if (optionMessageList.getStatus() == Status.EXCEPTION) {
+                    ExportChatInviteLink exportChatInviteLink = new ExportChatInviteLink();
+                    exportChatInviteLink.setChatId(chat.getId());
+                    String inviteLink;
+                    try {
+                        inviteLink = bot.execute(exportChatInviteLink);
+                    } catch (TelegramApiException e) {
+                        bot.execute(Util.toMessage(chat.getId(), "У бота недостаточно прав для создания ссылки-приглашения"));
+                        LOGGER.error("Ошибка при создании ссылки-приглашения: {}", e.getMessage());
+                        return;
+                    }
+                    boolean b = Example.joinChatByInviteLink(inviteLink);
+                    if (!b) {
+                        GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
+                        getChatAdministrators.setChatId(chat.getId());
+                        ArrayList<ChatMember> chatAdministrators = bot.execute(getChatAdministrators);
+                        Optional<ChatMember> creator = chatAdministrators.stream()
+                                .filter(chatMember -> chatMember.getStatus().equals("creator"))
+                                .findFirst();
+                        if (creator.isPresent()) {
+                            ChatMember chatMember = creator.get();
+                            chatMember.getUser().getId();
+                            bot.execute(Util.toMessage(chatMember.getUser().getId(), "Ошибка с ботом"));
+                            LOGGER.error("ошибка во время подключения компонента Бота к каналу: {}", chat.getTitle());
 
-                List<TdApi.Message> messageList = Example.getChatHistory(chat.getId(), 10).join();
-//                System.out.println("=================================================");
+                        }
+                    }
+                }
 
                 TdApi.Message msg = null;
-                SpecialOption specialOption = null;
+                SpecialOption<TdApi.Message> specialOption = null;
                 int delayMinutes = 5;
 
                 for (int i = 0; i < 5; i++) {
                     specialOption = Example.getMessageWithText(chat.getId(), 10, text).join();
                     if (specialOption.getStatus() == Status.OK) {
-                        msg = specialOption.getMessage();
+                        msg = specialOption.get();
                         break;
                     } else if (specialOption.getStatus() == Status.EMPTY) {
                         LOGGER.warn("message not found: {}", text);

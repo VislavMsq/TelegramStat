@@ -302,6 +302,7 @@
             </column>
         </createTable>
     </changeSet>
+    <!--endregion-->
     <!-- region web_users -->
     <changeSet id="create-web_users" author="Vladyslav Mosiuk">
         <createTable tableName="web_users">
