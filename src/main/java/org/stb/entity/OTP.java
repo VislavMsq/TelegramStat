@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,6 +30,9 @@ public class OTP {
     @Column(name = "user_name")
     private String name;
 
+    @Column(name = "expiry_time")
+    private LocalDateTime expiryTime;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,6 +53,7 @@ public class OTP {
                 ", otp=" + otp +
                 ", name='" + name +
                 ", userId=" + userId +
+                ", expiryTime=" + expiryTime +
                 '}';
     }
 }

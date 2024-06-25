@@ -297,6 +297,9 @@
             <column name="user_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="expiry_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
             <column name="user_id" type="bigint">
                 <constraints nullable="false"/>
             </column>

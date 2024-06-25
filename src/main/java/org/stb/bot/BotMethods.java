@@ -48,6 +48,7 @@ public class BotMethods {
     private final ConnectionService connectionService;
     private final WebStatsRepository webStatsRepository;
     private final PostRepository postRepository;
+    private final WebUserRepository webUserRepository;
 
     @Transactional
     public void handleUpdate(Update update, MyWebhookBot bot) throws TelegramApiException, ExecutionException, InterruptedException {
@@ -95,15 +96,13 @@ public class BotMethods {
                         GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
                         getChatAdministrators.setChatId(chat.getId());
                         ArrayList<ChatMember> chatAdministrators = bot.execute(getChatAdministrators);
-                        Optional<ChatMember> creator = chatAdministrators.stream()
-                                .filter(chatMember -> chatMember.getStatus().equals("creator"))
-                                .findFirst();
-                        if (creator.isPresent()) {
-                            ChatMember chatMember = creator.get();
-                            chatMember.getUser().getId();
-                            bot.execute(Util.toMessage(chatMember.getUser().getId(), "Ошибка с ботом"));
-                            LOGGER.error("ошибка во время подключения компонента Бота к каналу: {}", chat.getTitle());
-
+//
+                        for (ChatMember chatAdministrator : chatAdministrators) {
+                            Boolean exists = webUserRepository.existsByTelegramId(chatAdministrator.getUser().getId());
+                            if (exists) {
+                                bot.execute(Util.toMessage(chatAdministrator.getUser().getId(), "Ошибка с ботом"));
+                                LOGGER.error("ошибка во время подключения компонента Бота к каналу: {}", chat.getTitle());
+                            }
                         }
                     }
                 }
@@ -173,11 +172,17 @@ public class BotMethods {
         if (!update.hasMessage()) {
             return;
         }
-        if (!update.getMessage().hasText()) {
+        if (!update.getMessage().
+
+                hasText()) {
             // вернемся, отвечаю
             return;
         }
-        if (!update.getMessage().getChat().isUserChat()) {
+        if (!update.getMessage().
+
+                getChat().
+
+                isUserChat()) {
             if (!Util.isUserAdmin(update.getMessage().getChatId(), update.getMessage().getFrom().getId(), bot)) {
                 checkMessage(update, bot);
                 if (update.getMessage().getText().startsWith("/")) {
@@ -186,11 +191,19 @@ public class BotMethods {
                 return;
             }
         }
-        if (update.getMessage().getText().startsWith("/connect")) {
+        if (update.getMessage().
+
+                getText().
+
+                startsWith("/connect")) {
             connectionService.handleConnectMessage(update, bot);
             return;
         }
-        if (update.getMessage().getText().startsWith("/start")) {
+        if (update.getMessage().
+
+                getText().
+
+                startsWith("/start")) {
             handleStartMessage(update, bot);
             return;
         }
@@ -199,11 +212,19 @@ public class BotMethods {
 //            bot.execute(toMessage(update.getMessage().getChatId(), update.getMessage().getMessageId().toString()));
 //        }
 
-        if (update.getMessage().getText().startsWith("/authorize")) {
+        if (update.getMessage().
+
+                getText().
+
+                startsWith("/authorize")) {
             proceedUserMessage(update, bot);
             return;
         }
-        if (update.getMessage().getText().startsWith("/poll")) {
+        if (update.getMessage().
+
+                getText().
+
+                startsWith("/poll")) {
             bot.execute(callBackService.createCallBack(update));
         }
 //        if (update.hasMessage() && update.getMessage().hasText()) {
@@ -256,7 +277,7 @@ public class BotMethods {
         }
     }
 
-    // з апдейта получити команду яка була визвана
+// з апдейта получити команду яка була визвана
 // потім взати код сходити з кодом в базу і получити фідбек від бота
 //    private void proceedAdminMessage(Update update, TGBot bot) throws TelegramApiException {
 //        String text = update.getMessage().getText();
